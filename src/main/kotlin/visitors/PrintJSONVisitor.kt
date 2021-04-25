@@ -4,12 +4,13 @@ import JSONNumber
 import JSONString
 import models.*
 
-class PrintJSON : Visitor {
+class PrintJSONVisitor : Visitor {
 
+    //TODO: refactor commas print
     var output: String = ""
     override fun visit(obj: JSONObject): Boolean {
 
-        output +="{"
+        output +="{ "
 
         return true
     }
@@ -17,40 +18,40 @@ class PrintJSON : Visitor {
     override fun endVisit(obj: JSONObject) {
 
         output +="}"
-        output.replace(" ,}", "}")
+        output = output.replace(", }", " }")
 
 
     }
     override fun visit(array: JSONArray): Boolean {
-        output +="["
+        output +="[ "
 
         return true
     }
 
     override fun endVisit(array: JSONArray) {
-        output = output.substring(0, output.length-1)
-        output +="]"
+        output +="], "
+        output = output.replace(", ]", " ]")
     }
     override fun visit(str: JSONString) {
-        output +=" \"${str.value}\" ,"
+        output +="\"${str.value}\", "
     }
 
-    override fun visit(value: JSONNull) {
-        output +=" null ,"
+    override fun visit(n: JSONNull) {
+        output +="null, "
     }
 
     override fun visit(bool: JSONBoolean) {
-        output +=" ${bool.value} ,"
+        output +="${bool.value}, "
 
     }
 
     override fun visit(number: JSONNumber) {
-        output +=" ${number.value} ,"
+        output +="${number.value}, "
     }
 
 
-    override fun visit(value: JSONKey) {
-        output += "\"${value.value}\": "
+    override fun visit(key: JSONKey) {
+        output += "\"${key.value}\": "
     }
 
 }

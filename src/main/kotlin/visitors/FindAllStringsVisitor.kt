@@ -2,11 +2,11 @@ package visitors
 
 import JSONString
 
-class FindAllStrings : Visitor{
+class FindAllStringsVisitor : Visitor {
 
     val output = mutableListOf<String>()
     val count: Int
-        get(){
+        get() {
             return output.size
         }
 
