@@ -2,9 +2,11 @@ import org.junit.Test
 import visitors.PrintJSONVisitor
 import kotlin.test.assertEquals
 
+
 class Phase2Tests {
 
-    data class Point(val x: Double, val y: Double, val name: String?)
+    data class Point(val x: Double, val y: Double,
+                     @Exclude val name: String?)
 
     data class Person(
         val name: String, val age: Int, val position: List<String>,
@@ -90,7 +92,7 @@ class Phase2Tests {
         val v = PrintJSONVisitor()
         val ee = jg.instantiate(p1)
         ee.accept(v)
-        assertEquals("{ \"name\": null, \"x\": 2.0, \"y\": 2.0 }", v.output)
+        assertEquals("{ \"x\": 2.0, \"y\": 2.0 }", v.output)
 
     }
 

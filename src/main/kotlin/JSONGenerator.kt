@@ -1,10 +1,12 @@
 import models.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.hasAnnotation
+
+@Target(AnnotationTarget.PROPERTY)
+annotation class Exclude()
 
 class JSONGenerator() {
-
-    //TODO: Insert Annotations
 
     fun instantiate(v: Any?): JSONValue =
         when (v) {
@@ -14,7 +16,7 @@ class JSONGenerator() {
             null -> JSONNull()
             is Collection<*> -> instantiateCollection(v)
             is Map<*, *> -> instantiateMap(v)
-            //is Enum<*> -> instantiateEnum(v)
+            is Enum<*> -> instantiateEnum(v)
             else -> instantiateClass(v)
         }
 
@@ -25,7 +27,8 @@ class JSONGenerator() {
         val values = HashMap<JSONKey, JSONValue>()
 
         properties.forEach {
-            it.call(c).let { v -> values[JSONKey(it.name)] = instantiate(v) }
+            if(!it.hasAnnotation<Exclude>())
+                it.call(c).let { v -> values[JSONKey(it.name)] = instantiate(v) }
         }
 
         return JSONObject(values)
@@ -51,7 +54,13 @@ class JSONGenerator() {
     }
 
     //TODO Enum instantiation
+    private fun instantiateEnum(e: Enum<*>): JSONArray {
 
+        val output = mutableListOf<JSONValue>()
+
+
+        return JSONArray(output)
+    }
 }
 
 
