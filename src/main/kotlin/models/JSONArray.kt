@@ -8,7 +8,6 @@ class JSONArray(val elems: Collection<JSONValue>) : JSONValue() {
 
     override fun accept(v: Visitor) {
 
-
         if (v.visit(this)) {
 
             elems.forEach { it.accept(v) }

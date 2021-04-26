@@ -16,7 +16,7 @@ class JSONGenerator() {
             null -> JSONNull()
             is Collection<*> -> instantiateCollection(v)
             is Map<*, *> -> instantiateMap(v)
-            is Enum<*> -> instantiateEnum(v)
+            is Enum<*> -> JSONString(v.name)
             else -> instantiateClass(v)
         }
 
@@ -53,14 +53,6 @@ class JSONGenerator() {
         return JSONObject(output)
     }
 
-    //TODO Enum instantiation
-    private fun instantiateEnum(e: Enum<*>): JSONArray {
-
-        val output = mutableListOf<JSONValue>()
-
-
-        return JSONArray(output)
-    }
 }
 
 

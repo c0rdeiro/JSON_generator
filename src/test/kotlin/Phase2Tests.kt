@@ -6,13 +6,19 @@ import kotlin.test.assertEquals
 class Phase2Tests {
 
     data class Point(val x: Double, val y: Double,
-                     @Exclude val name: String?)
+                     @Exclude val name: String?,
+                     val form: Form
+                        )
 
     data class Person(
         val name: String, val age: Int, val position: List<String>,
         val skills: List<String>?, val salary: Map<Int, Number?>,
         val nabo: Boolean
     )
+
+    enum class Form{
+        Circle, Rectangle, Square
+    }
 
     @Test
     fun string() {
@@ -86,13 +92,13 @@ class Phase2Tests {
 
     @Test
     fun SimpleDataClass() {
-        val p1 = Point(2.0, 2.0, null)
+        val p1 = Point(2.0, 2.0, null, Form.Circle)
 
         val jg = JSONGenerator()
         val v = PrintJSONVisitor()
         val ee = jg.instantiate(p1)
         ee.accept(v)
-        assertEquals("{ \"x\": 2.0, \"y\": 2.0 }", v.output)
+        assertEquals("{ \"y\": 2.0, \"x\": 2.0, \"form\": \"Circle\" }", v.output)
 
     }
 
