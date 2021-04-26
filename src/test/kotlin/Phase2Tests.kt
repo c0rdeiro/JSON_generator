@@ -5,6 +5,10 @@ import kotlin.test.assertEquals
 
 class Phase2Tests {
 
+    enum class Form{
+        Circle, Rectangle, Square
+    }
+
     data class Point(val x: Double, val y: Double,
                      @Exclude val name: String?,
                      val form: Form
@@ -13,12 +17,8 @@ class Phase2Tests {
     data class Person(
         val name: String, val age: Int, val position: List<String>,
         val skills: List<String>?, val salary: Map<Int, Number?>,
-        val nabo: Boolean
+        @Exclude val nabo: Boolean
     )
-
-    enum class Form{
-        Circle, Rectangle, Square
-    }
 
     @Test
     fun string() {
@@ -29,7 +29,7 @@ class Phase2Tests {
 
         val istr = jg.instantiate(str)
         istr.accept(v)
-        assertEquals("\"${str}\", ", v.output)
+        assertEquals("\"${str}\"", v.output)
 
 
     }
@@ -42,7 +42,7 @@ class Phase2Tests {
         val v = PrintJSONVisitor()
         val ii = jg.instantiate(i)
         ii.accept(v)
-        assertEquals("$i, ", v.output)
+        assertEquals("$i", v.output)
     }
 
     @Test
@@ -53,7 +53,7 @@ class Phase2Tests {
         val v = PrintJSONVisitor()
         val dd = jg.instantiate(d)
         dd.accept(v)
-        assertEquals("$d, ", v.output)
+        assertEquals("$d", v.output)
     }
 
 
@@ -65,7 +65,7 @@ class Phase2Tests {
         val v = PrintJSONVisitor()
         val ee = jg.instantiate(e)
         ee.accept(v)
-        assertEquals("$e, ", v.output)
+        assertEquals("$e", v.output)
     }
 
     @Test
@@ -76,7 +76,7 @@ class Phase2Tests {
         val v = PrintJSONVisitor()
         val ee = jg.instantiate(b)
         ee.accept(v)
-        assertEquals("$b, ", v.output)
+        assertEquals("$b", v.output)
     }
 
     @Test
@@ -87,7 +87,7 @@ class Phase2Tests {
         val v = PrintJSONVisitor()
         val ee = jg.instantiate(b)
         ee.accept(v)
-        assertEquals("$b, ", v.output)
+        assertEquals("$b", v.output)
     }
 
     @Test
@@ -116,7 +116,7 @@ class Phase2Tests {
         val ee = jg.instantiate(me)
         ee.accept(v)
         val eo =
-            "{ \"skills\": null, \"nabo\": true, \"name\": \"Francisco\", \"position\": [ \"Student\", \"Trainee\" ], \"age\": 21, \"salary\": { \"2019\": null, \"2020\": 19000.88 }}"
+            "{ \"name\": \"Francisco\", \"age\": 21, \"position\": [ \"Student\", \"Trainee\" ], \"salary\": { \"2019\": null, \"2020\": 19000.88 }, \"skills\": null }"
 
         assertEquals(eo, v.output)
 
@@ -141,6 +141,6 @@ class Phase2Tests {
         val v = PrintJSONVisitor()
         val ee = jg.instantiate(arr)
         ee.accept(v)
-        assertEquals("[ \"three\", \"two\", \"one\" ], ", v.output)
+        assertEquals("[ \"three\", \"two\", \"one\" ]", v.output)
     }
 }

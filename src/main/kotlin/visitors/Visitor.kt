@@ -2,6 +2,7 @@ package visitors
 
 import JSONNumber
 import JSONString
+import JSONValue
 import models.*
 
 interface Visitor {
@@ -15,4 +16,5 @@ interface Visitor {
     fun visit(bool: JSONBoolean){}
     fun visit(n: JSONNull){}
     fun visit(key: JSONKey){}
+    fun visitSeparator(){}
 }

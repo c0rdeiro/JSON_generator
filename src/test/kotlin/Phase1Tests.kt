@@ -17,10 +17,28 @@ class Phase1Tests {
 
 
     @Test
+    fun printString(){
+        val v = PrintJSONVisitor()
+        val eo = "\"this is a string test\""
+        JSONString("this is a string test").accept(v)
+
+        assertEquals(eo, v.output)
+    }
+
+    @Test
+    fun printSimpleObj(){
+        val v = PrintJSONVisitor()
+        val eo = "{ \"tier2\": \"Kappa\", \"thirdin\": null, \"second\": [ 2, 4 ] }"
+        obj1.accept(v)
+
+        assertEquals(eo, v.output)
+    }
+
+    @Test
     fun printObject(){
 
         val v1 = PrintJSONVisitor()
-        val expected_out1 = "{ \"name\": false, \"pepe\": \"guardioka\", \"another level\": { \"tier2\": \"Kappa\", \"thirdin\": null, \"second\": [ 2, 4 ] }}"
+        val expected_out1 = "{ \"name\": false, \"another level\": { \"second\": [ 2, 4 ], \"thirdin\": null, \"tier2\": \"Kappa\" }, \"pepe\": \"guardioka\" }"
         test1.accept(v1)
 
         assertEquals(expected_out1, v1.output)
@@ -29,7 +47,7 @@ class Phase1Tests {
     @Test
     fun printArray(){
         val v2 = PrintJSONVisitor()
-        val expected_output2 = "[ 2, 4 ], "
+        val expected_output2 = "[ 2, 4 ]"
         arr1.accept(v2)
 
         assertEquals(expected_output2, v2.output)
