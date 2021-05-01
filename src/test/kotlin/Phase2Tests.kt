@@ -11,7 +11,7 @@ class Phase2Tests {
 
     data class Point(val x: Double, val y: Double,
                      @Exclude val name: String?,
-                     val form: Form
+                     @ChangeName("geometry") val form: Form
                         )
 
     data class Person(

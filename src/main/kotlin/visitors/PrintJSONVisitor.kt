@@ -7,7 +7,6 @@ import models.*
 
 class PrintJSONVisitor : Visitor {
 
-    //TODO: refactor commas print
     var output: String = ""
     override fun visit(obj: JSONObject): Boolean {
 

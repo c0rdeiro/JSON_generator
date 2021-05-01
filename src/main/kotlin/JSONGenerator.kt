@@ -1,23 +1,30 @@
 import models.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 
 @Target(AnnotationTarget.PROPERTY)
 annotation class Exclude()
 
+@Target(AnnotationTarget.PROPERTY)
+annotation class ChangeName(val newName: String)
+
 class JSONGenerator() {
 
     fun instantiate(v: Any?): JSONValue =
-        when (v) {
-            is String -> JSONString(v)
-            is Number -> JSONNumber(v)
-            is Boolean -> JSONBoolean(v)
-            null -> JSONNull()
-            is Collection<*> -> instantiateCollection(v)
-            is Map<*, *> -> instantiateMap(v)
-            is Enum<*> -> JSONString(v.name)
-            else -> instantiateClass(v)
+        when {
+            v is String -> JSONString(v)
+            v is Number -> JSONNumber(v)
+            v is Boolean -> JSONBoolean(v)
+            v == null -> JSONNull()
+            v is Collection<*> -> instantiateCollection(v)
+            v is Map<*, *> -> instantiateMap(v)
+            v is Enum<*> -> JSONString(v.name)
+            v::class.isData -> instantiateClass(v)
+            else -> throw IllegalArgumentException("Unsupported data type.")
         }
 
 
@@ -28,7 +35,7 @@ class JSONGenerator() {
 
         properties.forEach {
             if(!it.hasAnnotation<Exclude>())
-                it.call(c).let { v -> values[JSONKey(it.name)] = instantiate(v) }
+                it.call(c).let { v -> values[mapKey(it)] = instantiate(v) }
         }
 
         return JSONObject(values)
@@ -51,6 +58,14 @@ class JSONGenerator() {
         map.forEach { output[JSONKey(it.key.toString())] = instantiate(it.value) }
 
         return JSONObject(output)
+    }
+
+    private fun mapKey(key: KProperty1<*, *>): JSONKey{
+
+        return if(key.hasAnnotation<ChangeName>())
+            JSONKey(key.findAnnotation<ChangeName>()!!.newName)
+        else
+            JSONKey(key.name)
     }
 
 }
