@@ -13,9 +13,6 @@ import visitors.PrintJSONVisitor
 import org.eclipse.swt.widgets.TreeItem
 
 
-
-
-
 fun main() {
     data class Point(val x: Int, val y: Int)
     data class Person(
@@ -32,22 +29,28 @@ fun main() {
 
 
     val o = JSONGenerator().instantiate(test)
-    Structure().open(o)
+    //Visualizer().open(o)
+    val v = Injector.create(Visualizer::class)
+    v.open(o)
 
 }
 
-class Structure() {
-
+class Visualizer() {
 
     val shell: Shell
     val tree: Tree
+    var display: Display
+
+    @Inject
+    private var icons: IconSetup? = null
 
     init {
-        shell = Shell(Display.getDefault())
+
+        display = Display.getDefault()
+        shell = Shell(display)
         shell.setSize(1000, 1000)
         shell.text = "File tree skeleton"
         shell.layout = GridLayout(2, false)
-
         tree = Tree(shell, SWT.SINGLE or SWT.BORDER)
         val label = Label(shell, SWT.NONE)
 
@@ -64,35 +67,25 @@ class Structure() {
             }
         })
 
-
         val searchInput = Text(shell, SWT.BORDER)
 
-        searchInput.addModifyListener { event -> // Get the widget whose text was modified
+        searchInput.addModifyListener { event ->
             val text = event.widget as Text
 
             getAllItems(tree)
                 .forEach {
                     if (it.text.contains(text.text) && text.text.isNotBlank())
-                        it.setBackground(Color(255, 255, 102))
+                        it.background = Color(255, 255, 102)
                     else
-                        it.setBackground(null)
-
+                        it.background = null
                 }
-
-
         }
-
-
     }
 
-    // auxiliar para profundidade do nó
-    fun TreeItem.depth(): Int =
-        if (parentItem == null) 0
-        else 1 + parentItem.depth()
-
-
     fun open(root: JSONValue) {
-        root.accept(CreateUITree(tree))
+
+
+        root.accept(CreateUITree(tree, icons))
 
         tree.expandAll()
         shell.pack()
@@ -117,21 +110,19 @@ private fun Tree.traverse(visitor: (TreeItem) -> Unit) {
     items.forEach { it.traverse() }
 }
 
-private fun getAllItems(tree: Tree) : MutableList<TreeItem>{
+private fun getAllItems(tree: Tree): MutableList<TreeItem> {
     val allItems = mutableListOf<TreeItem>()
 
-    for (item in tree.items)
-        getAllItems(item, allItems)
+    tree.items.forEach {
+        getAllItems(it, allItems)
+    }
 
     return allItems
 }
-
-private fun getAllItems(currentItem: TreeItem, allItems: MutableList<TreeItem>) {
-
-    val children = currentItem.items
-
-    for (child in children) {
-        allItems.add(child)
-        getAllItems(child, allItems)
+fun getAllItems(treeItem: TreeItem, allItems: MutableList<TreeItem>){
+    treeItem.items.forEach {
+        allItems.add(it)
+        getAllItems(it, allItems)
     }
+
 }

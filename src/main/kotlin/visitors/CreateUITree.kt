@@ -2,55 +2,57 @@ package visitors
 
 import JSONNumber
 import JSONString
+import JSONValue
+import UI.IconSetup
 import models.*
 import org.eclipse.swt.SWT
+import org.eclipse.swt.graphics.Image
+import org.eclipse.swt.widgets.Display
 import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeItem
+import java.lang.IllegalArgumentException
 
-class CreateUITree(val tree: Tree) : Visitor {
+class CreateUITree(val tree: Tree, val icons: IconSetup?) : Visitor {
 
-    var currParent: TreeItem? = null
-    var currKey: String = ""
+
+    private var currParent: TreeItem? = null
+    private var currKey: String = ""
+
 
     override fun visit(str: JSONString) {
         val node = TreeItem(currParent, SWT.NONE)
 
-        node.text = currKey + "\"${str.value}\""
-        node.data = str
-
-        currKey = ""
+        populateNode(node, str)
     }
+
 
     override fun visit(number: JSONNumber) {
 
         val node = TreeItem(currParent, SWT.NONE)
-        node.text = currKey + number.value.toString()
-        node.data = number
 
-        currKey = ""
+        populateNode(node, number)
     }
+
 
     override fun visit(n: JSONNull) {
 
         val node = TreeItem(currParent, SWT.NONE)
-        node.text = currKey + "null"
-        node.data = n
 
-        currKey = ""
+        populateNode(node, n)
     }
+
 
     override fun visit(bool: JSONBoolean) {
 
         val node = TreeItem(currParent, SWT.NONE)
-        node.text = currKey + bool.value.toString()
-        node.data = bool
 
-        currKey = ""
+        populateNode(node, bool)
     }
 
     override fun visit(key: JSONKey) {
         currKey = "${key.value}: "
     }
+
 
     override fun visit(obj: JSONObject): Boolean {
         val node: TreeItem = if (currParent == null)
@@ -58,8 +60,7 @@ class CreateUITree(val tree: Tree) : Visitor {
         else
             TreeItem(currParent, SWT.NONE)
 
-        node.text = "(object)"
-        node.data = obj
+        populateNode(node, obj)
         currParent = node
         return true
     }
@@ -68,17 +69,15 @@ class CreateUITree(val tree: Tree) : Visitor {
         currParent = currParent?.parentItem
     }
 
+
     override fun visit(arr: JSONArray): Boolean {
         val node: TreeItem = if (currParent == null)
             TreeItem(tree, SWT.NONE)
         else
             TreeItem(currParent, SWT.NONE)
 
-        node.text = if (currKey.isEmpty()) "(array)" else currKey
-
-        node.data = arr
+        populateNode(node, arr)
         currParent = node
-
 
         currKey = ""
 
@@ -87,6 +86,36 @@ class CreateUITree(val tree: Tree) : Visitor {
 
     override fun endVisit(arr: JSONArray) {
         currParent = currParent?.parentItem
+    }
+
+    fun populateNode(node: TreeItem, value: JSONValue){
+
+
+        if(icons != null){
+            node.text = icons.getText(value)
+            node.image = Image(Display.getDefault(), icons.getPath(value))
+        }
+        else{
+            node.text = currKey + valueToString(value)
+        }
+        node.data = value
+
+        currKey = ""
+    }
+
+    fun valueToString(value: JSONValue): String{
+
+        return when(value){
+
+            is JSONString -> "\"${value.value}\""
+            is JSONNumber -> value.value.toString()
+            is JSONBoolean -> value.value.toString()
+            is JSONNull -> "null"
+            is JSONObject -> "(object)"
+            is JSONArray -> "(array)"
+            else -> throw IllegalArgumentException("Unsupported data type.")
+
+        }
     }
 
 }

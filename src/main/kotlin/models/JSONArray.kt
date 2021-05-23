@@ -3,16 +3,16 @@ package models
 import JSONValue
 import visitors.Visitor
 
-class JSONArray(val elems: MutableCollection<JSONValue>) : JSONValue() {
+class JSONArray(val elements: MutableCollection<JSONValue>) : JSONValue() {
 
 
     override fun accept(v: Visitor) {
         var counter = 0
         if (v.visit(this)) {
 
-            elems.forEach {
+            elements.forEach {
                 it.accept(v)
-                if(counter < elems.size-1)
+                if(counter < elements.size-1)
                     v.visitSeparator()
                 counter ++
             }
@@ -22,14 +22,14 @@ class JSONArray(val elems: MutableCollection<JSONValue>) : JSONValue() {
     }
 
     fun addValue(value: JSONValue){
-        elems.add(value)
+        elements.add(value)
     }
 
     fun addMany(arr: Collection<JSONValue>){
-        elems.addAll(arr)
+        elements.addAll(arr)
     }
 
     fun removeValue(value: JSONValue){
-        elems.remove(value)
+        elements.remove(value)
     }
 }
