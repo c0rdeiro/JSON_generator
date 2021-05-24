@@ -1,4 +1,4 @@
-package UI
+package UI.Setups
 
 import JSONNumber
 import JSONString
@@ -31,8 +31,19 @@ class DefaultIconSetup: IconSetup {
         else return "src/main/resources/folder.png"
     }
 
+    override fun toExclude(value: JSONValue): Boolean {
+        return when (value) {
+            is JSONObject -> value.nElements < 2
+            is JSONArray -> value.nElements > 2
+            else -> false
+        }
+    }
+
 
     fun isLeaf(value: JSONValue) =
         !(value is JSONObject || value is JSONArray)
+
+
+
 
 }

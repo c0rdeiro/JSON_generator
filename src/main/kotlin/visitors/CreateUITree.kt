@@ -3,7 +3,7 @@ package visitors
 import JSONNumber
 import JSONString
 import JSONValue
-import UI.IconSetup
+import UI.Setups.IconSetup
 import models.*
 import org.eclipse.swt.SWT
 import org.eclipse.swt.graphics.Image
@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeItem
 import java.lang.IllegalArgumentException
 
-class CreateUITree(val tree: Tree, val icons: IconSetup?) : Visitor {
+class CreateUITree(val tree: Tree, val icons: IconSetup) : Visitor {
 
 
     private var currParent: TreeItem? = null
@@ -20,33 +20,38 @@ class CreateUITree(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     override fun visit(str: JSONString) {
-        val node = TreeItem(currParent, SWT.NONE)
 
-        populateNode(node, str)
+        if (!icons.toExclude(str)) {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, str)
+        }
     }
 
 
     override fun visit(number: JSONNumber) {
 
-        val node = TreeItem(currParent, SWT.NONE)
-
-        populateNode(node, number)
+        if (!icons.toExclude(number)) {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, number)
+        }
     }
 
 
     override fun visit(n: JSONNull) {
 
-        val node = TreeItem(currParent, SWT.NONE)
-
-        populateNode(node, n)
+        if (!icons.toExclude(n)) {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, n)
+        }
     }
 
 
     override fun visit(bool: JSONBoolean) {
 
-        val node = TreeItem(currParent, SWT.NONE)
-
-        populateNode(node, bool)
+        if (!icons.toExclude(bool)) {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, bool)
+        }
     }
 
     override fun visit(key: JSONKey) {
@@ -55,14 +60,19 @@ class CreateUITree(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     override fun visit(obj: JSONObject): Boolean {
-        val node: TreeItem = if (currParent == null)
-            TreeItem(tree, SWT.NONE)
-        else
-            TreeItem(currParent, SWT.NONE)
 
-        populateNode(node, obj)
-        currParent = node
-        return true
+        if(!icons.toExclude(obj)) {
+            val node: TreeItem = if (currParent == null)
+                TreeItem(tree, SWT.NONE)
+            else
+                TreeItem(currParent, SWT.NONE)
+
+            populateNode(node, obj)
+            currParent = node
+
+            return true
+        }
+        return false
     }
 
     override fun endVisit(obj: JSONObject) {
@@ -71,31 +81,31 @@ class CreateUITree(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     override fun visit(arr: JSONArray): Boolean {
-        val node: TreeItem = if (currParent == null)
-            TreeItem(tree, SWT.NONE)
-        else
-            TreeItem(currParent, SWT.NONE)
+        if(!icons.toExclude(arr)) {
+            val node: TreeItem = if (currParent == null)
+                TreeItem(tree, SWT.NONE)
+            else
+                TreeItem(currParent, SWT.NONE)
 
-        populateNode(node, arr)
-        currParent = node
+            populateNode(node, arr)
+            currParent = node
+            return true
+        }
 
-        currKey = ""
-
-        return true
+        return false
     }
 
     override fun endVisit(arr: JSONArray) {
         currParent = currParent?.parentItem
     }
 
-    fun populateNode(node: TreeItem, value: JSONValue){
+    fun populateNode(node: TreeItem, value: JSONValue) {
 
 
-        if(icons != null){
+        if (icons != null) {
             node.text = icons.getText(value)
             node.image = Image(Display.getDefault(), icons.getPath(value))
-        }
-        else{
+        } else {
             node.text = currKey + valueToString(value)
         }
         node.data = value
@@ -103,9 +113,9 @@ class CreateUITree(val tree: Tree, val icons: IconSetup?) : Visitor {
         currKey = ""
     }
 
-    fun valueToString(value: JSONValue): String{
+    fun valueToString(value: JSONValue): String {
 
-        return when(value){
+        return when (value) {
 
             is JSONString -> "\"${value.value}\""
             is JSONNumber -> value.value.toString()

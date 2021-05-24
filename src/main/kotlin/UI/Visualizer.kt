@@ -2,6 +2,8 @@ package UI
 
 import JSONGenerator
 import JSONValue
+import UI.Setups.IconSetup
+import models.JSONNull
 import org.eclipse.swt.SWT
 import org.eclipse.swt.events.SelectionAdapter
 import org.eclipse.swt.events.SelectionEvent
@@ -14,7 +16,7 @@ import org.eclipse.swt.widgets.TreeItem
 
 
 fun main() {
-    data class Point(val x: Int, val y: Int)
+    data class Point(val x: Int, val y: Int )
     data class Person(
         val name: String,
         val age: Int,
@@ -23,7 +25,7 @@ fun main() {
         val hist: List<Point>
     )
 
-    val arr = listOf<String>("potato", "poteto")
+    val arr = listOf<String>("potato", "poteto", "radon")
     val arrP = listOf<Point>(Point(1, 1), Point(5, 5))
     val test = Person("Francisco", 21, Point(2, 2), arr, arrP)
 
@@ -42,7 +44,7 @@ class Visualizer() {
     var display: Display
 
     @Inject
-    private var icons: IconSetup? = null
+    private lateinit var icons: IconSetup
 
     init {
 
@@ -61,7 +63,7 @@ class Visualizer() {
                 (item.data as JSONValue).accept(visitor)
                 label.text = visitor.output
 
-                shell.setSize(1000, 500) //TODO: change this to set window size
+                shell.setSize(1000, 500) //TODO: change this to dynamic fit
                 shell.layout(true) //update layout
 
             }

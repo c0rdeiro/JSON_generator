@@ -17,6 +17,8 @@ class JSONObject(val elements: MutableMap<JSONKey, JSONValue>) : JSONValue() {
             this.elements.forEach {
                 if (it.value is JSONObject)
                     count += (it.value as JSONObject).nElements
+                else if (it.value is JSONArray)
+                    count += (it.value as JSONArray).nElements
                 else
                     count++
             }
