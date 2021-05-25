@@ -1,4 +1,4 @@
-package UI
+package ui
 
 import java.io.File
 import java.util.*
@@ -17,42 +17,46 @@ annotation class InjectAdd
 
 class Injector {
 
-    companion object{
+    companion object {
 
         val map: MutableMap<String, List<KClass<*>>> = mutableMapOf()
 
-        init{
+        init {
             val scanner = Scanner(File("di.properties"))
-            while(scanner.hasNext()){
+            while (scanner.hasNext()) {
                 val line = scanner.nextLine()
                 val parts = line.split("=")
-                map[parts[0]] =  parts[1].split(",")
+                map[parts[0]] = parts[1].split(",")
                     .map { Class.forName(it).kotlin }
 
             }
 
             scanner.close()
         }
-        fun <T: Any> create(type: KClass<T>): T{
+
+        fun <T : Any> create(type: KClass<T>): T {
 
             val o = type.createInstance()
 
             type.declaredMemberProperties.forEach {
                 it.isAccessible = true
-                if(it.hasAnnotation<Inject>()){
+                if (map.containsKey("Visualizer.icons"))
+                    if (it.hasAnnotation<Inject>()) {
 
-                    val key = type.simpleName + "." + it.name
-                    val obj = map[key]!!.first().createInstance()
-                    (it as KMutableProperty<*>).setter.call(o, obj)
-                }
-                else if(it.hasAnnotation<InjectAdd>()){
+                        val key = type.simpleName + "." + it.name
+                        val obj = map[key]!!.first().createInstance()
+                        (it as KMutableProperty<*>).setter.call(o, obj)
+                    }
+
+
+
+                if (it.hasAnnotation<InjectAdd>()) {
                     val key = type.simpleName + "." + it.name
 
-                    val obj = map[key]!!.map { it.createInstance()}
+                    val obj = map[key]!!.map { it.createInstance() }
                     (it.getter.call(o) as MutableList<Any>).addAll(obj)
                 }
             }
-
 
             return o
         }

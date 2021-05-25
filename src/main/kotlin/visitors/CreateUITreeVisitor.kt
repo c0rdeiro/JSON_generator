@@ -3,7 +3,7 @@ package visitors
 import JSONNumber
 import JSONString
 import JSONValue
-import UI.Setups.IconSetup
+import ui.IconSetups.IconSetup
 import models.*
 import org.eclipse.swt.SWT
 import org.eclipse.swt.graphics.Image
@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeItem
 import java.lang.IllegalArgumentException
 
-class CreateUITree(val tree: Tree, val icons: IconSetup) : Visitor {
+class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     private var currParent: TreeItem? = null
@@ -20,38 +20,38 @@ class CreateUITree(val tree: Tree, val icons: IconSetup) : Visitor {
 
 
     override fun visit(str: JSONString) {
+        if (icons != null && icons.toExclude(str)) return
 
-        if (!icons.toExclude(str)) {
-            val node = TreeItem(currParent, SWT.NONE)
-            populateNode(node, str)
-        }
+        val node = TreeItem(currParent, SWT.NONE)
+        populateNode(node, str)
+
     }
 
 
     override fun visit(number: JSONNumber) {
 
-        if (!icons.toExclude(number)) {
-            val node = TreeItem(currParent, SWT.NONE)
-            populateNode(node, number)
-        }
+        if (icons != null && icons.toExclude(number)) return
+
+        val node = TreeItem(currParent, SWT.NONE)
+        populateNode(node, number)
     }
 
 
     override fun visit(n: JSONNull) {
 
-        if (!icons.toExclude(n)) {
-            val node = TreeItem(currParent, SWT.NONE)
-            populateNode(node, n)
-        }
+        if (icons != null && icons.toExclude(n)) return
+
+        val node = TreeItem(currParent, SWT.NONE)
+        populateNode(node, n)
     }
 
 
     override fun visit(bool: JSONBoolean) {
 
-        if (!icons.toExclude(bool)) {
-            val node = TreeItem(currParent, SWT.NONE)
-            populateNode(node, bool)
-        }
+        if (icons != null && icons.toExclude(bool)) return
+
+        val node = TreeItem(currParent, SWT.NONE)
+        populateNode(node, bool)
     }
 
     override fun visit(key: JSONKey) {
@@ -61,18 +61,19 @@ class CreateUITree(val tree: Tree, val icons: IconSetup) : Visitor {
 
     override fun visit(obj: JSONObject): Boolean {
 
-        if(!icons.toExclude(obj)) {
-            val node: TreeItem = if (currParent == null)
-                TreeItem(tree, SWT.NONE)
-            else
-                TreeItem(currParent, SWT.NONE)
+        if (icons != null && icons.toExclude(obj)) return false
 
-            populateNode(node, obj)
-            currParent = node
 
-            return true
-        }
-        return false
+        val node: TreeItem = if (currParent == null)
+            TreeItem(tree, SWT.NONE)
+        else
+            TreeItem(currParent, SWT.NONE)
+
+        populateNode(node, obj)
+        currParent = node
+
+        return true
+
     }
 
     override fun endVisit(obj: JSONObject) {
@@ -81,18 +82,17 @@ class CreateUITree(val tree: Tree, val icons: IconSetup) : Visitor {
 
 
     override fun visit(arr: JSONArray): Boolean {
-        if(!icons.toExclude(arr)) {
-            val node: TreeItem = if (currParent == null)
-                TreeItem(tree, SWT.NONE)
-            else
-                TreeItem(currParent, SWT.NONE)
+        if (icons != null && icons.toExclude(arr)) return false
 
-            populateNode(node, arr)
-            currParent = node
-            return true
-        }
+        val node: TreeItem = if (currParent == null)
+            TreeItem(tree, SWT.NONE)
+        else
+            TreeItem(currParent, SWT.NONE)
 
-        return false
+        populateNode(node, arr)
+        currParent = node
+        return true
+
     }
 
     override fun endVisit(arr: JSONArray) {

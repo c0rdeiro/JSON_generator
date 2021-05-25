@@ -1,54 +1,32 @@
-package UI
+package ui
 
-import JSONGenerator
 import JSONValue
-import UI.Setups.IconSetup
-import models.JSONNull
+import ui.IconSetups.IconSetup
 import org.eclipse.swt.SWT
 import org.eclipse.swt.events.SelectionAdapter
 import org.eclipse.swt.events.SelectionEvent
 import org.eclipse.swt.graphics.Color
 import org.eclipse.swt.layout.GridLayout
 import org.eclipse.swt.widgets.*
-import visitors.CreateUITree
+import visitors.CreateUITreeVisitor
 import visitors.PrintJSONVisitor
 import org.eclipse.swt.widgets.TreeItem
 
 
-fun main() {
-    data class Point(val x: Int, val y: Int )
-    data class Person(
-        val name: String,
-        val age: Int,
-        val location: Point,
-        val pepe: List<String>,
-        val hist: List<Point>
-    )
-
-    val arr = listOf<String>("potato", "poteto", "radon")
-    val arrP = listOf<Point>(Point(1, 1), Point(5, 5))
-    val test = Person("Francisco", 21, Point(2, 2), arr, arrP)
-
-
-    val o = JSONGenerator().instantiate(test)
-    //Visualizer().open(o)
-    val v = Injector.create(Visualizer::class)
-    v.open(o)
-
-}
-
-class Visualizer() {
+class Visualizer {
 
     val shell: Shell
     val tree: Tree
-    var display: Display
 
     @Inject
-    private lateinit var icons: IconSetup
+    private var icons: IconSetup? = null
+
+    //@InjectAdd
+    //private val actions = mutableListOf<Action>()
 
     init {
 
-        display = Display.getDefault()
+        val display = Display.getDefault()
         shell = Shell(display)
         shell.setSize(1000, 1000)
         shell.text = "File tree skeleton"
@@ -84,10 +62,14 @@ class Visualizer() {
         }
     }
 
-    fun open(root: JSONValue) {
+    fun instantiate(root: JSONValue){
+        Injector.create(Visualizer::class).open(root)
+    }
+
+    private fun open(root: JSONValue) {
 
 
-        root.accept(CreateUITree(tree, icons))
+        root.accept(CreateUITreeVisitor(tree, icons))
 
         tree.expandAll()
         shell.pack()
@@ -98,33 +80,36 @@ class Visualizer() {
         }
         display.dispose()
     }
-}
 
-private fun Tree.expandAll() = traverse { it.expanded = true }
+    private fun Tree.expandAll() = traverse { it.expanded = true }
 
-private fun Tree.traverse(visitor: (TreeItem) -> Unit) {
-    fun TreeItem.traverse() {
-        visitor(this)
-        items.forEach {
-            it.traverse()
+    private fun Tree.traverse(visitor: (TreeItem) -> Unit) {
+        fun TreeItem.traverse() {
+            visitor(this)
+            items.forEach {
+                it.traverse()
+            }
         }
-    }
-    items.forEach { it.traverse() }
-}
-
-private fun getAllItems(tree: Tree): MutableList<TreeItem> {
-    val allItems = mutableListOf<TreeItem>()
-
-    tree.items.forEach {
-        getAllItems(it, allItems)
+        items.forEach { it.traverse() }
     }
 
-    return allItems
-}
-fun getAllItems(treeItem: TreeItem, allItems: MutableList<TreeItem>){
-    treeItem.items.forEach {
-        allItems.add(it)
-        getAllItems(it, allItems)
+    private fun getAllItems(tree: Tree): MutableList<TreeItem> {
+        val allItems = mutableListOf<TreeItem>()
+
+        tree.items.forEach {
+            getAllItems(it, allItems)
+        }
+
+        return allItems
+    }
+
+    private fun getAllItems(treeItem: TreeItem, allItems: MutableList<TreeItem>) {
+        treeItem.items.forEach {
+            allItems.add(it)
+            getAllItems(it, allItems)
+        }
+
     }
 
 }
+

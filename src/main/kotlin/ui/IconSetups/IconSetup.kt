@@ -1,4 +1,4 @@
-package UI.Setups
+package ui.IconSetups
 
 import JSONValue
 
