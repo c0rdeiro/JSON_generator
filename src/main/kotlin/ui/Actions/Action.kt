@@ -1,4 +1,4 @@
-package ui.ActionSetups
+package ui.Actions
 
 interface Action {
     val name: String

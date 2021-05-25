@@ -26,9 +26,20 @@ class DefaultIconSetup: IconSetup {
     }
 
     override fun getPath(value: JSONValue): String {
-        if(isLeaf(value))
-            return "src/main/resources/file.png"
-        else return "src/main/resources/folder.png"
+        return if(isLeaf(value))
+            "src/main/resources/file.png"
+        else "src/main/resources/folder.png"
+    }
+
+    override fun getIconWidth(value: JSONValue): Int {
+        return if(isLeaf(value))
+            25
+        else 20
+    }
+    override fun getIconHeight(value: JSONValue): Int {
+        return if(isLeaf(value))
+            25
+        else 20
     }
 
     override fun toExclude(value: JSONValue): Boolean {

@@ -28,9 +28,7 @@ class Injector {
                 val parts = line.split("=")
                 map[parts[0]] = parts[1].split(",")
                     .map { Class.forName(it).kotlin }
-
             }
-
             scanner.close()
         }
 
@@ -40,21 +38,22 @@ class Injector {
 
             type.declaredMemberProperties.forEach {
                 it.isAccessible = true
-                if (map.containsKey("Visualizer.icons"))
-                    if (it.hasAnnotation<Inject>()) {
 
-                        val key = type.simpleName + "." + it.name
+                if (it.hasAnnotation<Inject>()) {
+                    val key = type.simpleName + "." + it.name
+
+                    if (map.containsKey(key)) {
                         val obj = map[key]!!.first().createInstance()
                         (it as KMutableProperty<*>).setter.call(o, obj)
                     }
-
-
+                }
 
                 if (it.hasAnnotation<InjectAdd>()) {
                     val key = type.simpleName + "." + it.name
-
-                    val obj = map[key]!!.map { it.createInstance() }
-                    (it.getter.call(o) as MutableList<Any>).addAll(obj)
+                    if (map.containsKey(key)) {
+                        val obj = map[key]!!.map { it.createInstance() }
+                        (it.getter.call(o) as MutableList<Any>).addAll(obj)
+                    }
                 }
             }
 

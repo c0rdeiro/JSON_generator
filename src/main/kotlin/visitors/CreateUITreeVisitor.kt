@@ -29,7 +29,6 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     override fun visit(number: JSONNumber) {
-
         if (icons != null && icons.toExclude(number)) return
 
         val node = TreeItem(currParent, SWT.NONE)
@@ -38,7 +37,6 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     override fun visit(n: JSONNull) {
-
         if (icons != null && icons.toExclude(n)) return
 
         val node = TreeItem(currParent, SWT.NONE)
@@ -47,7 +45,6 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     override fun visit(bool: JSONBoolean) {
-
         if (icons != null && icons.toExclude(bool)) return
 
         val node = TreeItem(currParent, SWT.NONE)
@@ -60,9 +57,7 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     override fun visit(obj: JSONObject): Boolean {
-
         if (icons != null && icons.toExclude(obj)) return false
-
 
         val node: TreeItem = if (currParent == null)
             TreeItem(tree, SWT.NONE)
@@ -73,7 +68,6 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
         currParent = node
 
         return true
-
     }
 
     override fun endVisit(obj: JSONObject) {
@@ -91,8 +85,8 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
         populateNode(node, arr)
         currParent = node
-        return true
 
+        return true
     }
 
     override fun endVisit(arr: JSONArray) {
@@ -101,10 +95,10 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
     fun populateNode(node: TreeItem, value: JSONValue) {
 
-
         if (icons != null) {
             node.text = icons.getText(value)
-            node.image = Image(Display.getDefault(), icons.getPath(value))
+            val img = Image(Display.getDefault(), icons.getPath(value))
+            node.image = Image(Display.getDefault(), img.imageData.scaledTo(icons.getIconWidth(value), icons.getIconHeight(value)))
         } else {
             node.text = currKey + valueToString(value)
         }
@@ -116,7 +110,6 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
     fun valueToString(value: JSONValue): String {
 
         return when (value) {
-
             is JSONString -> "\"${value.value}\""
             is JSONNumber -> value.value.toString()
             is JSONBoolean -> value.value.toString()
@@ -124,7 +117,6 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
             is JSONObject -> "(object)"
             is JSONArray -> "(array)"
             else -> throw IllegalArgumentException("Unsupported data type.")
-
         }
     }
 

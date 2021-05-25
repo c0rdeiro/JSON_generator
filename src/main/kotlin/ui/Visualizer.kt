@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.*
 import visitors.CreateUITreeVisitor
 import visitors.PrintJSONVisitor
 import org.eclipse.swt.widgets.TreeItem
+import ui.Actions.Action
 
 
 class Visualizer {
@@ -21,8 +22,8 @@ class Visualizer {
     @Inject
     private var icons: IconSetup? = null
 
-    //@InjectAdd
-    //private val actions = mutableListOf<Action>()
+    @InjectAdd
+    private val actions = mutableListOf<Action>()
 
     init {
 
@@ -47,8 +48,13 @@ class Visualizer {
             }
         })
 
-        val searchInput = Text(shell, SWT.BORDER)
+//        actions.forEach { action ->
+//            val button = Button(action.name)
+//            button.addActionListener { action.execute(this) }
+//            frame.add(button)
+//        }
 
+        val searchInput = Text(shell, SWT.BORDER)
         searchInput.addModifyListener { event ->
             val text = event.widget as Text
 
@@ -67,7 +73,6 @@ class Visualizer {
     }
 
     private fun open(root: JSONValue) {
-
 
         root.accept(CreateUITreeVisitor(tree, icons))
 
