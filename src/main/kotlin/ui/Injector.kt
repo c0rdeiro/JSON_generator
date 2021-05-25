@@ -46,9 +46,7 @@ class Injector {
                         val obj = map[key]!!.first().createInstance()
                         (it as KMutableProperty<*>).setter.call(o, obj)
                     }
-                }
-
-                if (it.hasAnnotation<InjectAdd>()) {
+                } else if (it.hasAnnotation<InjectAdd>()) {
                     val key = type.simpleName + "." + it.name
                     if (map.containsKey(key)) {
                         val obj = map[key]!!.map { it.createInstance() }

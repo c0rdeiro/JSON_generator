@@ -48,12 +48,6 @@ class Visualizer {
             }
         })
 
-//        actions.forEach { action ->
-//            val button = Button(action.name)
-//            button.addActionListener { action.execute(this) }
-//            frame.add(button)
-//        }
-
         val searchInput = Text(shell, SWT.BORDER)
         searchInput.addModifyListener { event ->
             val text = event.widget as Text
@@ -68,14 +62,28 @@ class Visualizer {
         }
     }
 
+    private fun createActions(){
+        actions.forEach { action ->
+            val button = Button(shell, SWT.PUSH)
+            button.text = action.name
+
+            button.addSelectionListener(object: SelectionAdapter() {
+                override fun widgetSelected(e: SelectionEvent) {
+                    action.execute(tree.selection.first())
+                }
+            })
+        }
+    }
     fun instantiate(root: JSONValue){
         Injector.create(Visualizer::class).open(root)
     }
 
+
+
     private fun open(root: JSONValue) {
 
         root.accept(CreateUITreeVisitor(tree, icons))
-
+        createActions()
         tree.expandAll()
         shell.pack()
         shell.open()

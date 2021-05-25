@@ -1,7 +1,9 @@
 package ui.Actions
 
+import org.eclipse.swt.widgets.TreeItem
+
 interface Action {
     val name: String
-    fun execute()
+    fun execute(treeItem: TreeItem)
 
 }
