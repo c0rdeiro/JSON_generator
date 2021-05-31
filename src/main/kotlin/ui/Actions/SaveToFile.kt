@@ -54,7 +54,7 @@ class SaveToFile : Action {
                 (treeItem.data as JSONValue).accept(visitor)
 
                 try{
-                    val newFile = File(path, fileName)
+                    val newFile = File(path, "$fileName.json")
                     newFile.createNewFile()
                     newFile.writeText(visitor.output)
                     shell.dispose()
