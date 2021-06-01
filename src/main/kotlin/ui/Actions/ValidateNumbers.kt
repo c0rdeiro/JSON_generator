@@ -5,6 +5,11 @@ import JSONValue
 import models.JSONArray
 import models.JSONObject
 import org.eclipse.swt.widgets.TreeItem
+import org.eclipse.swt.SWT
+
+
+import org.eclipse.swt.widgets.MessageBox
+import org.eclipse.swt.widgets.Display
 
 
 //validates if all numbers are positive
@@ -14,15 +19,20 @@ class ValidateNumbers : Action {
 
     override fun execute(treeItem: TreeItem) {
 
-        val invalidCount = handleTreeData(treeItem.parent.items[0].data as JSONValue)
+        val invalidCount = checkTreeData(treeItem.parent.items[0].data as JSONValue)
+        val box = MessageBox(Display.getCurrent().activeShell, SWT.OK)
+        box.text = "Valid Numbers"
 
-        if (invalidCount == 0) println("valid boy")
-        else println("no bueno  $invalidCount")
+        if (invalidCount == 0)
+            box.message = "All numbers are positive."
+        else
+            box.message = "There "+ if (invalidCount == 1) "is" else {"are"} + " $invalidCount negative number" + if (invalidCount > 1) "s." else "."
 
+                    box.open()
 
     }
 
-    private fun handleTreeData(data: JSONValue): Int {
+    private fun checkTreeData(data: JSONValue): Int {
         var count = 0
         fun aux(data: JSONValue) {
             when (data) {

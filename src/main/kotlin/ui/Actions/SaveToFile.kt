@@ -24,7 +24,7 @@ class SaveToFile : Action {
         var path = ""
         val shell = initializeShell("Save JSON", 500, 500)
 
-        val filenameLabel = Text(shell, SWT.NONE)
+        val filenameLabel = Text(shell, SWT.READ_ONLY)
         filenameLabel.text = "Insert filename: "
 
         val filenameInput = Text(shell, SWT.BORDER)
@@ -34,7 +34,7 @@ class SaveToFile : Action {
 
         }
 
-        val pathLabel = Text(shell, SWT.NONE)
+        val pathLabel = Text(shell, SWT.READ_ONLY)
         pathLabel.text = "Insert path: "
 
         val pathInput = Text(shell, SWT.BORDER)
@@ -51,14 +51,21 @@ class SaveToFile : Action {
                 val visitor = PrintJSONVisitor()
                 (treeItem.data as JSONValue).accept(visitor)
 
+                val box = MessageBox(Display.getCurrent().activeShell, SWT.OK)
                 try{
                     val newFile = File(path, "$fileName.json")
                     newFile.createNewFile()
                     newFile.writeText(visitor.output)
+                    box.text = "File saved."
+                    box.message = "File save successfully in ${newFile.absolutePath}"
+                    box.open()
                     shell.dispose()
                 }catch (e: IOException){
-                    println("Cannot find specified path.") //TODO: show an alert instead
+                    box.text = "Invalid Path."
+                    box.message = "Cannot find specified path."
+                    box.open()
                 }
+
             }
         })
 
