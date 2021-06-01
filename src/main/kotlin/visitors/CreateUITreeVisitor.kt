@@ -23,38 +23,40 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
         if (icons != null && icons.toExclude(str)) {
             if (currParent != null)
                 removeValFromParent(str)
+        } else {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, str)
         }
-        val node = TreeItem(currParent, SWT.NONE)
-        populateNode(node, str)
-
     }
 
     override fun visit(number: JSONNumber) {
         if (icons != null && icons.toExclude(number)) {
             if (currParent != null)
                 removeValFromParent(number)
+        } else {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, number)
         }
-        val node = TreeItem(currParent, SWT.NONE)
-        populateNode(node, number)
-
     }
 
     override fun visit(n: JSONNull) {
         if (icons != null && icons.toExclude(n)) {
             if (currParent != null)
                 removeValFromParent(n)
+        } else {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, n)
         }
-        val node = TreeItem(currParent, SWT.NONE)
-        populateNode(node, n)
     }
 
     override fun visit(bool: JSONBoolean) {
         if (icons != null && icons.toExclude(bool)) {
             if (currParent != null)
                 removeValFromParent(bool)
+        } else {
+            val node = TreeItem(currParent, SWT.NONE)
+            populateNode(node, bool)
         }
-        val node = TreeItem(currParent, SWT.NONE)
-        populateNode(node, bool)
     }
 
     override fun visit(key: JSONKey) {
@@ -123,11 +125,12 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     private fun removeValFromParent(value: JSONValue) {
+        //TODO: missing recursion
         when (currParent!!.data) {
             is JSONObject -> currParent!!.data =
-                JSONObject((currParent!!.data as JSONObject).elements.filter { it.value != value } as MutableMap<JSONKey, JSONValue>)
+                JSONObject((currParent!!.data as JSONObject).elements.filterValues { it != value } as MutableMap<JSONKey, JSONValue>)
             is JSONArray -> currParent!!.data =
-                JSONArray((currParent!!.data as JSONArray).elements.filter { it != value })
+                JSONArray((currParent!!.data as JSONArray).elements.filter { it != value } as MutableList<JSONValue>)
         }
     }
 

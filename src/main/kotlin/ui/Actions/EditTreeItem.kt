@@ -3,7 +3,10 @@ package ui.Actions
 import JSONNumber
 import JSONString
 import JSONValue
+import models.JSONArray
 import models.JSONBoolean
+import models.JSONKey
+import models.JSONObject
 import org.eclipse.swt.SWT
 import org.eclipse.swt.events.SelectionAdapter
 import org.eclipse.swt.events.SelectionEvent
@@ -11,6 +14,7 @@ import org.eclipse.swt.widgets.Button
 import org.eclipse.swt.widgets.Text
 import org.eclipse.swt.widgets.TreeItem
 import utils.initializeShell
+import java.lang.IllegalArgumentException
 
 class EditTreeItem : Action {
 
@@ -33,9 +37,12 @@ class EditTreeItem : Action {
         saveButton.addSelectionListener(object : SelectionAdapter() {
             override fun widgetSelected(e: SelectionEvent) {
 
-                handleJSONData(treeItem.data as JSONValue, treeItem)
+                val newValue = handleJSONData(treeItem.data as JSONValue, treeItem)
 
-                //editParentData(treeItem.parentItem, treeItem)
+                editParentData(treeItem.parentItem, treeItem, newValue)
+                treeItem.data = newValue
+                //TODO: missing change of parent data and recursively until root
+
                 shell.dispose()
             }
         })
@@ -52,20 +59,31 @@ class EditTreeItem : Action {
         shell.open()
     }
 
-    private fun handleJSONData(data: JSONValue, treeItem: TreeItem) {
+    private fun handleJSONData(data: JSONValue, treeItem: TreeItem): JSONValue {
 
-        when(data){
-            is JSONString -> treeItem.data = JSONString(treeItem.text)
-            is JSONNumber -> treeItem.data = JSONNumber(treeItem.text.toInt())
-            is JSONBoolean -> treeItem.data = treeItem.text.toBoolean()
+        return when (data) {
+            is JSONString -> JSONString(treeItem.text)
+            is JSONNumber -> JSONNumber(treeItem.text.toInt())
+            is JSONBoolean -> JSONBoolean(treeItem.text.toBoolean())
+            else -> throw IllegalArgumentException("cannot edit that tree item node")
         }
 
     }
 
-//    private fun editParentData(parent: TreeItem, currentItem: TreeItem){
-//
-//        parent.data = currentItem.data //só é verdade para os seguintes, no primeiro tem de ir buscar o resto dos items
-//    }
+    private fun editParentData(parent: TreeItem, oldItem: TreeItem, newValue: JSONValue) {
+        when (parent.data) {
+            is JSONObject -> (parent.data as JSONObject).elements
+                                    .forEach {
+                                        if(it.value == oldItem.data)
+                                                (parent.data as JSONObject).elements[it.key] = newValue
+                                    }
+            is JSONArray -> (parent.data as JSONArray).elements
+                                    .forEach{
+                                        if(it == oldItem.data)
+                                            (parent.data as JSONArray).elements[(parent.data as JSONArray).elements.indexOf(it)] = newValue
+                                    }
+        }
+    }
 
 
 }

@@ -40,6 +40,5 @@ class JSONObject(val elements: MutableMap<JSONKey, JSONValue>) : JSONValue() {
 
             v.endVisit(this)
         }
-
     }
 }

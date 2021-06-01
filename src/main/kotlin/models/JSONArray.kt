@@ -3,8 +3,7 @@ package models
 import JSONValue
 import visitors.Visitor
 
-class JSONArray(val elements: List<JSONValue>) : JSONValue() {
-
+class JSONArray(val elements: MutableList<JSONValue>) : JSONValue() {
 
     val nElements: Int
         get() {
@@ -33,7 +32,5 @@ class JSONArray(val elements: List<JSONValue>) : JSONValue() {
             }
             v.endVisit(this)
         }
-
     }
-
 }

@@ -45,13 +45,13 @@ class DefaultIconSetup: IconSetup {
     override fun toExclude(value: JSONValue): Boolean {
         return when (value) {
             is JSONObject -> value.nElements < 2
-            is JSONArray -> value.nElements > 2
+            is JSONString -> true
             else -> false
         }
     }
 
 
-    fun isLeaf(value: JSONValue) =
+    private fun isLeaf(value: JSONValue) =
         !(value is JSONObject || value is JSONArray)
 
 
