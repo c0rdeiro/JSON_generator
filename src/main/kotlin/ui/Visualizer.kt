@@ -26,13 +26,13 @@ class Visualizer {
     private val actions = mutableListOf<Action>()
 
     init {
-
         val display = Display.getDefault()
         shell = Shell(display)
         shell.setSize(1000, 1000)
         shell.text = "File tree skeleton"
         shell.layout = GridLayout(2, false)
         tree = Tree(shell, SWT.SINGLE or SWT.BORDER)
+
         val label = Label(shell, SWT.NONE)
 
         tree.addSelectionListener(object : SelectionAdapter() {
@@ -44,7 +44,6 @@ class Visualizer {
 
                 shell.setSize(1000, 500) //TODO: change this to dynamic fit
                 shell.layout(true) //update layout
-
             }
         })
 
@@ -74,11 +73,10 @@ class Visualizer {
             })
         }
     }
+
     fun instantiate(root: JSONValue){
         Injector.create(Visualizer::class).open(root)
     }
-
-
 
     private fun open(root: JSONValue) {
 

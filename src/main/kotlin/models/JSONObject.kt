@@ -42,16 +42,4 @@ class JSONObject(val elements: MutableMap<JSONKey, JSONValue>) : JSONValue() {
         }
 
     }
-
-    fun addPair(key: JSONKey, value: JSONValue){
-        elements[key] = value
-    }
-
-    fun addManyPairs(hashMap: HashMap<JSONKey, JSONValue>){
-        elements.putAll(hashMap)
-    }
-
-    fun removeByKey(key: JSONKey){
-        elements.remove(key)
-    }
 }

@@ -8,6 +8,7 @@ import org.eclipse.swt.events.SelectionAdapter
 import org.eclipse.swt.events.SelectionEvent
 import org.eclipse.swt.layout.FillLayout
 import org.eclipse.swt.widgets.*
+import utils.initializeShell
 import java.io.IOException
 
 
@@ -21,11 +22,8 @@ class SaveToFile : Action {
 
         var fileName = ""
         var path = ""
+        val shell = initializeShell("Save JSON", 500, 500)
 
-        val shell = Shell(Display.getDefault())
-        shell.setSize(500, 500)
-        shell.text = "Save JSON"
-        shell.layout = FillLayout()
         val filenameLabel = Text(shell, SWT.NONE)
         filenameLabel.text = "Insert filename: "
 
@@ -59,7 +57,7 @@ class SaveToFile : Action {
                     newFile.writeText(visitor.output)
                     shell.dispose()
                 }catch (e: IOException){
-                    println("Cannot find specified path.")
+                    println("Cannot find specified path.") //TODO: show an alert instead
                 }
             }
         })
@@ -71,9 +69,9 @@ class SaveToFile : Action {
                 shell.dispose()
             }
         })
+
+
         shell.pack()
         shell.open()
     }
-
-
 }

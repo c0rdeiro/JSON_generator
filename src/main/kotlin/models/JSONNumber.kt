@@ -1,6 +1,6 @@
 import visitors.Visitor
 
-class JSONNumber(val value: Number) : JSONValue() {
+class JSONNumber(var value: Number) : JSONValue() {
 
     override fun accept(v: Visitor) {
         v.visit(this)

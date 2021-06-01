@@ -3,7 +3,7 @@ package models
 import JSONValue
 import visitors.Visitor
 
-class JSONArray(val elements: MutableCollection<JSONValue>) : JSONValue() {
+class JSONArray(val elements: List<JSONValue>) : JSONValue() {
 
 
     val nElements: Int
@@ -36,15 +36,4 @@ class JSONArray(val elements: MutableCollection<JSONValue>) : JSONValue() {
 
     }
 
-    fun addValue(value: JSONValue) {
-        elements.add(value)
-    }
-
-    fun addMany(arr: Collection<JSONValue>) {
-        elements.addAll(arr)
-    }
-
-    fun removeValue(value: JSONValue) {
-        elements.remove(value)
-    }
 }
