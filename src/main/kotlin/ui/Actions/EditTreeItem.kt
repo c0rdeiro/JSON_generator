@@ -38,10 +38,12 @@ class EditTreeItem : Action {
             override fun widgetSelected(e: SelectionEvent) {
 
                 val newValue = handleJSONData(treeItem.data as JSONValue, treeItem)
-
-                editParentData(treeItem.parentItem, treeItem, newValue)
+                var aux: TreeItem? = treeItem.parentItem
+                while(aux != null) {
+                    editParentData(aux, treeItem, newValue)
+                    aux = aux.parentItem
+                }
                 treeItem.data = newValue
-                //TODO: missing change of parent data and recursively until root
 
                 shell.dispose()
             }
