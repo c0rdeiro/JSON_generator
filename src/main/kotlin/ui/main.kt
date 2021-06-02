@@ -16,6 +16,8 @@ fun main() {
     val arrP = listOf<Point>(Point(1, 1), Point(5, 5))
     val test = Person("Francisco", 21, Point(-2, -2), arr, arrP)
 
+    val test2 = Person("Inácio", 31, Point(-2, -2), arr, arrP)
+    val classroom = listOf<Person>(test, test2)
 
     val o = JSONGenerator().instantiate(test)
     Visualizer().instantiate(o)

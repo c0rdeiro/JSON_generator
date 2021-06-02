@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Display
 import org.eclipse.swt.widgets.Tree
 import org.eclipse.swt.widgets.TreeItem
 import java.lang.IllegalArgumentException
+import kotlin.test.currentStackTrace
 
 class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
@@ -125,13 +126,37 @@ class CreateUITreeVisitor(val tree: Tree, val icons: IconSetup?) : Visitor {
 
 
     private fun removeValFromParent(value: JSONValue) {
-        //TODO: missing recursion
+        val oldValue: JSONValue = currParent!!.data as JSONValue
         when (currParent!!.data) {
-            is JSONObject -> currParent!!.data =
-                JSONObject((currParent!!.data as JSONObject).elements.filterValues { it != value } as MutableMap<JSONKey, JSONValue>)
-            is JSONArray -> currParent!!.data =
-                JSONArray((currParent!!.data as JSONArray).elements.filter { it != value } as MutableList<JSONValue>)
+            is JSONObject ->
+                currParent!!.data =
+                    JSONObject((currParent!!.data as JSONObject).elements.filterValues { it != value } as MutableMap<JSONKey, JSONValue>)
+            is JSONArray ->
+                currParent!!.data =
+                    JSONArray((currParent!!.data as JSONArray).elements.filter { it != value } as MutableList<JSONValue>)
         }
+        if (currParent!!.parentItem != null)
+            deleteUntilRoot(oldValue, currParent!!.data as JSONValue, currParent!!.parentItem)
+    }
+
+    private fun deleteUntilRoot(oldValue: JSONValue, newValue: JSONValue, parent: TreeItem) {
+        val new_oldValue: JSONValue = parent.data as JSONValue
+        when (parent.data) {
+            is JSONObject ->
+
+                (parent.data as JSONObject).elements
+                    .forEach { if (oldValue == it.value) (parent.data as JSONObject).elements[it.key] = newValue }
+            is JSONArray ->
+                (parent.data as JSONArray).elements
+                    .forEach {
+                        if (it == oldValue) (parent.data as JSONArray).elements[(parent.data as JSONArray).elements.indexOf(
+                            it
+                        )] = newValue
+                    }
+
+        }
+        if (parent.parentItem != null)
+            deleteUntilRoot(new_oldValue, parent.data as JSONValue, parent.parentItem)
     }
 
     private fun valueToString(value: JSONValue): String {
